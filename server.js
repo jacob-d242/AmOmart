@@ -20,12 +20,23 @@ mongoose.connect(process.env.MONGODB_URL || 'mongodb://localhost/amazona', {
   useUnifiedTopology: true,
   useCreateIndex: true,
 });
+  //deployment
+if (process.env.NODE_ENV === 'production'){
+  app.use(express.static('frontend/build'));
+
+  app.get('*', (req, res) =>{
+     res.sendFile(path.resolve(__dirname, '/frontend/build/index.html'));
+  });
+}
+
+
+
 app.use('/api/uploads', uploadRouter);
 app.use('/api/users', userRouter);
 app.use('/api/products', productRouter);
 app.use('/api/orders', orderRouter);
 app.get('/api/config/paypal', (req, res) => {
-  res.send(process.env.PAYPAL_CLIENT_ID || 'sb');
+  res.send(process.env.PAYPAL_CLIENT_ID || ' ');
 });
 app.get('/api/config/google', (req, res) => {
   res.send(process.env.GOOGLE_API_KEY || '');
@@ -33,6 +44,8 @@ app.get('/api/config/google', (req, res) => {
 const __dirname = path.resolve();
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 app.use(express.static(path.join(__dirname, '/frontend/build')));
+
+
 app.get('*', (req, res) =>
   res.sendFile(path.join(__dirname, '/frontend/build/index.html'))
 );
@@ -110,8 +123,8 @@ io.on('connection', (socket) => {
         user.messages.push(message);
       } else {
         io.to(socket.id).emit('message', {
-          name: 'Admin',
-          body: 'Sorry. I am not online right now',
+          name: 'Omart Kenya',
+          body: 'Sorry. We are  not online right now, we will get back to you as soon as',
         });
       }
     }
